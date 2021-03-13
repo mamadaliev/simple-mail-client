@@ -10,7 +10,7 @@
 - MongoDB 4.4.4
 - Docker 20.10
 
-## Install
+## Quick Start
 To install, build and run this project follow this steps:
 1. Install Git CLI if it already not installed.
 
