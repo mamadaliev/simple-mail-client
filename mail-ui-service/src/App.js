@@ -1,9 +1,13 @@
 // import './App.css';
 
+import Counter from "./components/examples/Counter";
+import Todo from "./components/examples/Todo";
+
 function App() {
   return (
     <div>
-        Hello React!
+      <Counter/>
+      <Todo/>
     </div>
   );
 }
