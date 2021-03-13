@@ -3,7 +3,7 @@ import {makeAutoObservable} from "mobx";
 class Todo {
 
     todos = [
-        {id: "1", text: "Wake up at 9 o'clock", completed: false}
+        // {id: "1", title: "Wake up at 9 o'clock", completed: false}
     ]
 
     constructor() {
