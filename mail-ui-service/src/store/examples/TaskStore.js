@@ -5,6 +5,7 @@ const {runInAction} = require("mobx");
 
 class TaskStore {
 
+    isLoaded = false
     taskList = []
     currentTask = {
         id: 0,
@@ -17,11 +18,15 @@ class TaskStore {
         this.taskService = new TaskService()
     }
 
+    setLoaded(state) {
+        this.isLoaded = state
+    }
+
     getTasksAsync = async () => {
         try {
-            const data = await this.taskService.get()
+            const data = await this.taskService.getTasksAsync()
             runInAction(() => {
-                this.taskList = data;
+                this.taskList = data
             });
         } catch (error) {
             runInAction(() => {

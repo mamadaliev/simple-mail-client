@@ -2,6 +2,7 @@ import {makeAutoObservable} from "mobx";
 
 class Todo {
 
+    isLoading = false
     todos = [
         // {id: "1", title: "Wake up at 9 o'clock", completed: false}
     ]

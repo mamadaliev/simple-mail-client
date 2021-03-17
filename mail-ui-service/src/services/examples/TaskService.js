@@ -3,7 +3,7 @@ const TODOS = "/todos";
 
 class TaskService {
 
-    get = async () => {
+    getTasksAsync = async () => {
         const options = {
             method: "GET",
         }

@@ -1,0 +1,89 @@
+.header {
+    display: flex;
+    height: 32px;
+}
+
+.header ul {
+    display: flex;
+    margin: 0;
+    padding: 0 20px;
+    height: 32px;
+    list-style-type: none;
+}
+
+.header li {
+    display: flex;
+    float: left;
+}
+
+.header li a {
+    padding: 0 10px;
+    height: 32px;
+    line-height: 32px;
+}
+
+.container {
+    font-size: 16px;
+    padding: 0;
+}
+
+.email-select-panel {
+    display: flex;
+    padding: 10px 0;
+}
+
+.email-select-panel ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.email-select-panel ul li {
+    float: left;
+    padding: 0 10px 0 0;
+    line-height: 30px;
+}
+
+.email-select-panel ul li input[type="radio"] {
+}
+
+.radio-select {
+    float: left;
+    padding: 0 0 10px 10px;
+}
+
+.radio-select-text {
+    float: left;
+    padding: 4px 0 0 6px;
+}
+.saved-status {
+    color: limegreen; font-size: 16px; padding-left: 16px;
+}
+
+.primary-textarea {
+    width: 100%;
+    height: 120px;
+    border-color: #e0e0e0;
+    font-family: "Roboto Light", sans-serif;
+}
+.primary-input {
+    margin: 10px 0;
+    width: 100%;
+    border-color: #e0e0e0;
+}
+.settings-input-block {
+    margin: 20px 0;
+}
+.settings-input {
+    width: 480px;
+    border-color: #e0e0e0;
+}
+.send-btn {
+    background: #0099ff;
+}
+.send-btn:hover {
+    background: #000;
+}
+.save-btn {
+    margin: 16px 0;
+}
