@@ -1,13 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import clsx from 'clsx';
-import {fade, makeStyles, useTheme} from '@material-ui/core/styles';
+import {fade, makeStyles, useTheme, withStyles} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -17,10 +15,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import SearchIcon from '@material-ui/icons/Search';
 import MailIcon from '@material-ui/icons/Mail';
-import CreateIcon from '@material-ui/icons/Create';
 import TuneIcon from '@material-ui/icons/Tune';
 import {Button, InputBase} from "@material-ui/core";
-import {Link, Route, Switch} from "react-router-dom";
+import {Link, Route, Switch, useHistory} from "react-router-dom";
 import Home from "./components/pages/Home";
 import Inbox from "./components/pages/Inbox";
 import Sent from "./components/pages/Sent";
@@ -29,8 +26,18 @@ import Settings from "./components/pages/Settings";
 import Counter from "./components/examples/Counter";
 import TodoPage from "./components/examples/TodoPage";
 import Todo from "./components/examples/Todo";
+import Dialog from "@material-ui/core/Dialog";
+import MuiDialogTitle from "@material-ui/core/DialogTitle";
+import CloseIcon from "@material-ui/icons/Close";
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import MuiDialogContent from "@material-ui/core/DialogContent";
+import MuiDialogActions from "@material-ui/core/DialogActions";
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import SettingsStore from "./store/SettingsStore";
 
 const drawerWidth = 240;
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -109,7 +116,6 @@ const useStyles = makeStyles((theme) => ({
             marginLeft: theme.spacing(3),
             width: 'auto',
         },
-        color: '#000'
     },
     searchIcon: {
         padding: theme.spacing(0, 2),
@@ -126,6 +132,7 @@ const useStyles = makeStyles((theme) => ({
         padding: '4px 4px 4px 0',
     },
     inputInput: {
+        color: "black",
         padding: theme.spacing(1, 1, 1, 0),
         // vertical padding + font size from searchIcon
         paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
@@ -151,12 +158,90 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: fade('#0099ff', 1),
         },
     },
+    closeButton: {
+        position: 'absolute',
+        right: theme.spacing(1),
+        top: theme.spacing(1),
+        color: theme.palette.grey[500],
+    },
 }));
 
+const styles = (theme) => ({
+    root: {
+        margin: 0,
+        padding: theme.spacing(2),
+    },
+    closeButton: {
+        position: 'absolute',
+        right: theme.spacing(1),
+        top: theme.spacing(1),
+        color: theme.palette.grey[500],
+    },
+});
+
+const DialogTitle = withStyles(styles)((props) => {
+    const { children, classes, onClose, ...other } = props;
+    return (
+        <MuiDialogTitle disableTypography className={classes.root} {...other}>
+            <Typography variant="h6">{children}</Typography>
+            {onClose ? (
+                <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+                    <CloseIcon />
+                </IconButton>
+            ) : null}
+        </MuiDialogTitle>
+    );
+});
+
+const DialogContent = withStyles((theme) => ({
+    root: {
+        padding: theme.spacing(2),
+    },
+}))(MuiDialogContent);
+
+const DialogActions = withStyles((theme) => ({
+    root: {
+        margin: 0,
+        padding: theme.spacing(1),
+    },
+}))(MuiDialogActions);
+
 export default function Main() {
+
+    useState(() => {
+        SettingsStore.settings.isGmail = localStorage.getItem('isGmail') === ''
+            ? true
+            : localStorage.getItem('isGmail');
+
+        SettingsStore.settings.protocol = localStorage.getItem('protocol') === ''
+            ? 'smtp'
+            : localStorage.getItem('protocol');
+
+        SettingsStore.settings.port = localStorage.getItem('port') === ''
+            ? 578
+            : localStorage.getItem('port');
+
+        SettingsStore.settings.email = localStorage.getItem('email') === ''
+            ? ''
+            : localStorage.getItem('email');
+
+        SettingsStore.settings.password = localStorage.getItem('password') === ''
+            ? ''
+            : localStorage.getItem('password');
+    });
+
+    const history = useHistory();
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const [compose, setCompose] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setCompose(true)
+    };
+    const handleClose = () => {
+        setCompose(false);
+    };
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -165,6 +250,11 @@ export default function Main() {
     const handleDrawerClose = () => {
         setOpen(false);
     };
+
+    function handleFullScreen() {
+        history.push("/compose");
+        handleClose();
+    }
 
     return (
         <div className={classes.root}>
@@ -176,7 +266,6 @@ export default function Main() {
             >
                 <Toolbar>
                     <IconButton
-                        color="#000"
                         aria-label="open drawer"
                         onClick={handleDrawerOpen}
                         edge="start"
@@ -187,16 +276,15 @@ export default function Main() {
                         <MenuIcon/>
                     </IconButton>
                     <Typography variant="h6" noWrap>
-                        <Link to='/compose'>
-                            <Button
-                                theme={theme}
-                                className={classes.button}
-                                variant="contained"
-                                color="primary"
-                            >
-                                Compose
-                            </Button>
-                        </Link>
+                        <Button
+                            theme={theme}
+                            className={classes.button}
+                            variant="contained"
+                            color="primary"
+                            onClick={handleClickOpen}
+                        >
+                            Compose +
+                        </Button>
                     </Typography>
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>
@@ -271,6 +359,20 @@ export default function Main() {
                     </Switch>
                 </div>
             </main>
+
+            <Dialog onClose={handleClose} fullWidth={true} aria-labelledby="customized-dialog-title" open={compose}>
+                <DialogTitle id="customized-dialog-title" onClose={handleClose}>
+                    Compose
+                </DialogTitle>
+                <DialogActions>
+                    <IconButton className={classes.closeButton} onClick={handleFullScreen}>
+                        <FullscreenIcon />
+                    </IconButton>
+                </DialogActions>
+                <DialogContent>
+                    <Compose/>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

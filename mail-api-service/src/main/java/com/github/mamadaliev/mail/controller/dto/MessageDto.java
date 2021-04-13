@@ -1,13 +1,22 @@
 package com.github.mamadaliev.mail.controller.dto;
 
-import com.github.mamadaliev.mail.model.Detail;
-import com.github.mamadaliev.mail.model.Option;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class MessageDto {
 
-    private Option option;
+    private int id;
 
-    private Detail detail;
+    private String from;
+
+    private String to;
+
+    private String subject;
+
+    private String date;
+
+    private String content;
+
 }

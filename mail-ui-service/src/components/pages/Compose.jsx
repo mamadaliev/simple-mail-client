@@ -1,7 +1,13 @@
 import React from 'react';
-import {Button, createMuiTheme, Icon, Paper, TextareaAutosize, TextField} from "@material-ui/core";
+import {Button, createMuiTheme, Paper, TextField} from "@material-ui/core";
 import {fade, makeStyles} from '@material-ui/core/styles';
 import SendIcon from '@material-ui/icons/Send';
+import {observer} from "mobx-react-lite";
+import ComposeStore from "../../store/ComposeStore";
+import MailStore from "../../store/MailStore";
+
+import {Editor, EditorState} from 'draft-js';
+import 'draft-js/dist/Draft.css';
 
 const theme = createMuiTheme({
     overrides: {
@@ -32,8 +38,7 @@ const useStyles = makeStyles((theme) => ({
     paperContainer: {
         padding: '0 30px 20px 30px',
     },
-    sendContainer: {
-    },
+    sendContainer: {},
     input: {
         margin: '10px 0 10px 0',
         width: '100%'
@@ -44,27 +49,73 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Compose = () => {
+const Compose = observer(() => {
+
+    // const [compose, setCompose] = useState({
+    //     from: "",
+    //     to: "",
+    //     subject: "",
+    //     message: ""
+    // });
+
+    const [editorState, setEditorState] = React.useState(() => EditorState.createEmpty());
 
     const classes = useStyles();
 
+    const sendMessage = () => {
+        MailStore.sendMessage().then(r => {
+            console.log(r)
+            setTimeout(() => {
+                console.log("Get sent messages")
+                MailStore.getSentMessages().then(r => {
+                    console.log(r)
+                });
+            }, 8000);
+        });
+    }
+
     return (
         <div className={"container"}>
-            <Paper elevation={1} className={classes.paper}>
+            <Paper elevation={0} className={classes.paper}>
                 <div className={classes.paperContainer}>
                     <div>
-                        <TextField className={classes.input} id="standard-basic" label="To:" />
+                        <TextField
+                            className={classes.input}
+                            id="standard-basic"
+                            onChange={e => ComposeStore.compose.from = e.target.value}
+                            value={localStorage.getItem("email")}
+                            label="From:"
+                            disabled={true}/>
                     </div>
                     <div>
-                        <TextField className={classes.input} id="standard-basic" label="From:" />
+                        <TextField
+                            className={classes.input}
+                            id="standard-basic"
+                            onChange={e => ComposeStore.compose.to = e.target.value}
+                            value={ComposeStore.compose.to}
+                            label="To:"/>
+                    </div>
+                    <div>
+                        <TextField
+                            className={classes.input}
+                            id="standard-basic"
+                            onChange={e => ComposeStore.compose.subject = e.target.value}
+                            value={ComposeStore.compose.subject}
+                            label="Subject:"/>
+                    </div>
+                    <div>
+                        <Editor editorState={editorState} onChange={setEditorState} />
                     </div>
                     <div>
                         <TextField
                             className={classes.message}
                             id="multiline-static"
-                            label="Message"
+                            label="Message:"
                             multiline
-                            rowsMin={5}
+                            aria-rowcount={10}
+                            rows={10}
+                            onChange={e => ComposeStore.compose.message = e.target.value}
+                            value={ComposeStore.compose.message}
                         />
                         {/*<TextareaAutosize className={"primary-textarea"} rowsMin={5} placeholder={"Write a message"}/>*/}
                     </div>
@@ -74,8 +125,8 @@ const Compose = () => {
                             variant="contained"
                             color="primary"
                             className={classes.button}
-                            endIcon={<SendIcon/>}
-                        >
+                            onClick={sendMessage}
+                            endIcon={<SendIcon/>}>
                             Send
                         </Button>
                     </div>
@@ -83,6 +134,6 @@ const Compose = () => {
             </Paper>
         </div>
     );
-};
+});
 
 export default Compose;
